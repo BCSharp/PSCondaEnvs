@@ -1,37 +1,61 @@
 <#
 .SYNOPSIS
-Activates a conda virtualenv.
+Activates a Conda virtual environment.
 
 .DESCRIPTION
-Activate.ps1 and deactivate.ps1 recreates the existing virtualenv BAT files in PS1 format so they "just work" inside a Powershell session.  
+Deactivates previously activated Conda environment if any, then activates the chosen one.
+During activation, PS1 scripts in etc\conda\activate.d will be run as well.
+
 Note that on Windows there may be several directories in which envs are stored.
-One under the Anaconda installation dir\envs (may be read-only for the current user), another one under $HOME\.conda\envs.
+When Anaconda is installed by Visual Studio Installer,
+one location is in the Anaconda installation dir\envs (may be read-only for the current user), 
+another one in $HOME\.conda\envs.
 More locations can be configured in $HOME\.condarc
 
+.PARAMETER Name 
+Name of a virtual enviroment created by conda.
+
+.NOTES
 Tested with Anaconda 4.3.8
+
+Modifies the search PATH variable.
+
+Creates the following environment variables: 
+    CONDA_DEFAULT_ENV : name of the active environment
+    CONDA_PREFIX      : path to the root directory of the environment
+
+Creates the following PS variables:
+    CondaEnvPaths     : array of search paths added during activation
+
+Creates the following functions:
+    CondaUserPrompt   : saved original user prompt
+
+.LINK
+deactivate.ps1
+https://github.com/BCSharp/PSCondaEnvs
+
+.EXAMPLE
+PS C:> activate.ps1 TestEnv
+(TestEnv) PS C:>
+
+This command activates a Conda environment named "TestEnv".
+Any previously active Conda environment will be deactivated.
+
 #>
 
 Param(
-    [string]$condaNewEnv
+    [Parameter(
+        Mandatory=$true,
+        HelpMessage="Name of a virtual enviroment created by conda"
+    )]
+    [string] $Name
 )
 
-if (-not $condaNewEnv)
-{
-    Write-Host
-    Write-Host "Usage: activate.ps1 <envname>"
-    Write-Host
-    Write-Host "Deactivates previously activated Conda environment, then activates the chosen one."
-    Write-Host "During activation, PS1 scripts in etc\conda\activate.d will be run as well."
-    Write-Host
-    Write-Host
-    exit
-}
-
-# Ensure that path or name passed is valid before deactivating anything
-conda "..checkenv" "cmd.exe" "$condaNewEnv"
+Write-Information "Ensure that path or name passed is valid before deactivating anything"
+conda "..checkenv" "cmd.exe" "$Name"
 if (-not $?)
 {
-    Write-Host 'Environment not changed.'
+    Write-Host "Environment not changed." -ForegroundColor Red
     exit 
 }
 
@@ -41,45 +65,43 @@ if (Test-Path Env:\CONDA_DEFAULT_ENV) {
 }
 
 Write-Host
-Write-Host "Activating environment `"$condaNewEnv...`""
-$newPath = (conda "..activate" "cmd.exe" "$condaNewEnv")
+Write-Host "Activating environment `"$Name`"..."
+$newPath = (conda "..activate" "cmd.exe" "$Name")
 if (-not $?)
 {
-    Write-Host 'Environment not activated.'
+    Write-Host 'Environment not activated.' -ForegroundColor Red
     exit 
 }
-$Env:CONDA_DEFAULT_ENV = $condaNewEnv
+$global:CondaEnvPaths = $newPath -split ';'
+$Env:CONDA_DEFAULT_ENV = $Name
 
 # Do we have CONDA_PATH_PLACEHOLDER in PATH?
 $pathArray = $Env:PATH -split ';'
-$hasPlaceholder = $pathArray -contains 'CONDA_PATH_PLACEHOLDER'
+$hasPlaceholder = $pathArray -contains "CONDA_PATH_PLACEHOLDER"
 # look if the deactivate script left a placeholder for us.
 if ($hasPlaceholder) {
     # If it did, replace it with our newPath
-    $Env:PATH = ($pathArray |% {$_ -replace "CONDA_PATH_PLACEHOLDER","$newPath"}) -join ';'
-    # Save original path
-    $Env:ANACONDA_BASE_PATH = ($pathArray |? {$_ -ne "CONDA_PATH_PLACEHOLDER"}) -join ';'
+    $Env:PATH = ($pathArray | foreach {$_ -replace "CONDA_PATH_PLACEHOLDER","$newPath"}) -join ';'
 } else {
-    # If it did not, save old path, prepend newPath
-    $Env:ANACONDA_BASE_PATH = $Env:PATH
-    $Env:PATH="$newPath;$Env:ANACONDA_BASE_PATH"    
+    # If it did not, prepend newPath
+    $Env:PATH="$newPath;$Env:PATH"    
 }
 
-# always store the full path to the environment, since CONDA_DEFAULT_ENV varies
-$Env:CONDA_PREFIX = ($newPath -split ';')[0]
+# always store the full path to the environment, since location of CONDA_DEFAULT_ENV varies
+$Env:CONDA_PREFIX = $CondaEnvPaths[0]
 
 Write-Host
 Write-Host
 
 # Capture existing user prompt
-function global:condaUserPrompt {''}
-$Function:condaUserPrompt = $Function:prompt
+function global:CondaUserPrompt {''}
+$Function:CondaUserPrompt = $Function:prompt
 
 function global:prompt
 {
     # Add the env name to the current user prompt.
-    Write-Host "[$Env:CONDA_DEFAULT_ENV] " -nonewline -ForegroundColor Red
-    & $Function:condaUserPrompt
+    Write-Host "($Env:CONDA_DEFAULT_ENV) " -nonewline -ForegroundColor Green
+    & $Function:CondaUserPrompt
 }
 
 # Run any activate scripts
