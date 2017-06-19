@@ -35,7 +35,6 @@ PS C:> help activate -full
 ## Caveats
 
 * `Activate.ps1` uses internal conda commands `..checkenv` and `..activate` (just as `activate.bat` does). Things may stop working when conda changes the semantics of those commands. Also, older versions of conda (probably) do not support those commands.
-* Original `activate.bat` and `deactivate.bat` preserves location of Conda environment paths in PATH environment variable when switching to a new environment. This is not fully implemented yet.
 * The names of the scripts do not follow established PowerShell naming convention. Probably more appriopriate names for the sctipts would be `Enable-CondaEnv`/`Disable-CondaEnv`, or, even better: `Enter-CondaEnvironment`/`Exit-CondaEnvironment` (the verbs enable/disable are meant for lifecycle management). Long, but then again: New-Alias is your friend.
 
 ## Credits
