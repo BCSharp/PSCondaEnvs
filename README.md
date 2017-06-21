@@ -11,12 +11,13 @@ Copy `activate.ps1` and `deactivate.ps1` into your Anaconda\Scripts directory (W
 
 ## Usage
 
-When on Windows, always use command names with the `.ps1` extension. 
+Always use command names with the `.ps1` extension. 
 Although PowerShell prefers `.ps1` over `.bat`, when creating a new environment, conda copies `activate.bat` and `deactivate.bat` to `Scripts` directory of the new environment, which will be earlier on the search path than the `.ps1` scripts. Therefore: 
 ```
 PS C:\> activate.ps1 TestEnv
 (TestEnv) PS C:\> deactivate.ps1
 ```
+The same applies to macOS/Linux: the shell will try to run the `activate` Bash sctipt before `activate.ps1`, which is earlier on the search path.
 
 Of course, it is always possible to define aliases, which will take precedence over `.bat` files:
 ```
