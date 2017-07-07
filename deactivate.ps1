@@ -18,7 +18,7 @@ activate.ps1
 https://github.com/BCSharp/PSCondaEnvs
 
 .EXAMPLE
-(TestEnv) PS C:> deactivate.ps1
+(TestEnv) PS C:> deactivate
 PS C:>
 
 This command deactivates the active Conda environment named "TestEnv".
@@ -50,7 +50,7 @@ if (Test-Path $deactivate_d) {
 # This removes the previous Env from the path and restores the original path
 $pathSep = [System.IO.Path]::PathSeparator
 if ($CondaEnvPaths) {
-    $pathArray = $Env:PATH -split $pathSep
+    [System.Collections.ArrayList]$pathArray = $Env:PATH -split $pathSep
     if ($Hold) {
         Write-Verbose "Setting CONDA_PATH_PLACEHOLDER where current environment paths are..."
         $position = @($pathArray).IndexOf($CondaEnvPaths[0])
@@ -60,7 +60,11 @@ if ($CondaEnvPaths) {
     }
 
     Write-Verbose 'Removing environment search paths from $PATH...'
-    $Env:PATH = ($pathArray | Where-Object {$_ -notin $CondaEnvPaths}) -join $pathSep
+    # Remove the first occurance of each of the env paths
+    foreach ($element in $CondaEnvPaths) {
+	    $pathArray.Remove($element)
+    }
+    $Env:PATH = $pathArray -join $pathSep
     Write-Verbose 'Restored $PATH is:'
     Write-Verbose ('-' * 20)
     $Env:PATH -split $pathSep | Write-Verbose
