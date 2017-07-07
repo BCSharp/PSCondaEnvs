@@ -15,7 +15,8 @@ The command does not produce any output on success.
 Use parameter -Verbose to trace the execution.
 
 .PARAMETER Name 
-Name of a virtual enviroment created by conda.
+Name of a virtual enviroment created by conda.  Not specifying this will activate the 'root'
+environment.
 
 .NOTES
 Tested with Anaconda 4.3.8
@@ -37,7 +38,7 @@ deactivate.ps1
 https://github.com/BCSharp/PSCondaEnvs
 
 .EXAMPLE
-PS C:> activate.ps1 TestEnv
+PS C:> activate TestEnv
 (TestEnv) PS C:>
 
 This command activates a Conda environment named "TestEnv".
@@ -126,4 +127,12 @@ if (Test-Path $activate_d) {
     Push-Location $activate_d
     Get-ChildItem -Filter *.ps1 | Select-Object -ExpandProperty FullName | Invoke-Expression
     Pop-Location
+}
+
+if(!(Get-Alias -name activate*)) {
+    New-Alias activate activate.ps1 -Scope Global
+}
+    
+if(!(Get-Alias -name deactivate*)) {
+    New-Alias deactivate deactivate.ps1 -Scope Global
 }
