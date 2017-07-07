@@ -51,7 +51,7 @@ Param(
         Mandatory=$true,
         HelpMessage="Name of a virtual enviroment created by conda"
     )]
-    [string] $Name
+    [string] $Name = "root"
 )
 
 Write-Verbose "Ensure that path or name passed is valid before deactivating anything"

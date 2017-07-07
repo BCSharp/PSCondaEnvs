@@ -1,2 +1,2 @@
 #!/bin/bash
-echo Please use the 'setup_psconda.sh' command to configure the 'pscondaenvs' package as a default Conda package. > $PREFIX/.messages.txt
+echo "Use 'activate <envname>' or 'deactivate <envname>' in Powershell to manage the current environment." > $PREFIX/.messages.txt
