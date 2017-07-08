@@ -8,7 +8,9 @@ Works with PowerShell 2.0 and up.
 ## Quick Install
 
 Open a Powershell or Command Prompt session, and enter the following command:
-`conda install -n root -c pscondaenvs pscondaenvs`
+```
+conda install -n root -c pscondaenvs pscondaenvs
+```
 
 Done! Note, if required, the installation process will automatically attempt to change the Powershell `Execution-Policy` to `RemoteSigned` in order for this package to work.
 
