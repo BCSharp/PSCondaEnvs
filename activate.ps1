@@ -53,6 +53,12 @@ Param(
     [string] $Name = "root"
 )
 
+# fix for pre-PS3
+if (-not $PSScriptRoot) { 
+    $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent 
+}
+
+
 Write-Verbose "Ensure that path or name passed is valid before deactivating anything"
 if ($IsOSX -or $IsLinux) {
     $shellType = 'bash'
@@ -112,7 +118,7 @@ Write-Verbose 'Capture existing user prompt...'
 function global:CondaUserPrompt {''}
 $Function:CondaUserPrompt = $Function:prompt
 
-Write-Verbose 'Set up environment-specific propmpt...'
+Write-Verbose 'Set up environment-specific prompt...'
 function global:prompt
 {
     # Add the env name to the current user prompt.
@@ -122,12 +128,37 @@ function global:prompt
 # Run any activate scripts
 $activate_d = "${Env:CONDA_PREFIX}/etc/conda/activate.d"
 if (Test-Path $activate_d) {
-    Write-Verbose "Running activate scripts in '$activate_d'..."
+    Write-Verbose "Running .ps1 activate scripts in '$activate_d'..."
     Push-Location $activate_d
     Get-ChildItem -Filter *.ps1 | Select-Object -ExpandProperty FullName | Invoke-Expression
+
+    # If in Windows, we allow backwards compatibility to run .bat files.  This relies upon 
+    # the Invoke-CmdScript by John Robbins.  The version provided maintains PS 2.0 compatibility
+    if (-not ($IsOSX -or $IsLinux)) {
+        $loadBatFiles = $FALSE
+        # If WintellectPowerShell module installed use that
+        $CmdScriptPath = Join-Path -Path $PSScriptRoot -ChildPath "invoke_cmdscript.ps1"
+        if (Get-Command Invoke-CmdScript -CommandType Function -errorAction SilentlyContinue ) {
+            $loadBatFiles = $TRUE
+        } elseif ([System.IO.File]::Exists("$CmdScriptPath")) {
+            . $CmdScriptPath
+            $loadBatFiles = $TRUE
+        } else {
+            Write-Verbose "Invoke-CmdScript function not available! .bat files won't run"
+        }
+        if ($loadBatFiles) {
+            Write-Verbose "Running .bat activate scripts in '$activate_d'..."
+            $bats = Get-ChildItem -Filter *.bat | Select-Object -ExpandProperty FullName
+            foreach ($bat in $bats) {
+                Invoke-CmdScript $bat
+            }
+        }
+    }
     Pop-Location
 }
 
+# Because Conda won't propogate activate.ps1 or deactivate.ps1 throughout all environments automatically,
+# we add an alias to override any .bat or .sh files that might try to be executed instead.
 if(!(Get-Alias -name activate*)) {
     New-Alias activate activate.ps1 -Scope Global
 }
