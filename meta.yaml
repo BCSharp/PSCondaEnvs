@@ -12,3 +12,4 @@ about:
   home: https://github.com/BCSharp/PSCondaEnvs
   license: MIT
   license_file: LICENSE
+  summary: Quickly and easily add `activate` and `deactivate` support to your Powershell console.  Just do `conda install -n root -c pscondaenvs pscondaenvs`.
