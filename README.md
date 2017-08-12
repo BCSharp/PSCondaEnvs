@@ -16,7 +16,7 @@ Done! Note, if required, the installation process will automatically attempt to 
 
 ## Manual Install
 
-If you want to install manually to avoid ExecutionPolicy setting or for some other reason, copy `activate.ps1` and `deactivate.ps1` into your Anaconda\Scripts directory (Windows) or anaconda/bin directory (macOS, Linux).
+If you want to install manually to avoid ExecutionPolicy setting or for some other reason, copy `activate.ps1`, `deactivate.ps1` and `invoke_cmdscript.ps1` into your Anaconda\Scripts directory (Windows) or `activate.ps1` and `deactivate.ps1` to anaconda/bin directory (macOS, Linux).
 
 ## Usage
 
@@ -26,7 +26,7 @@ PS C:\> activate TestEnv
 (TestEnv) PS C:\> deactivate
 ```
 
-For fine control of activation of an individual environment, `activate.ps1` will execute any `.ps1` scripts in `etc\conda\activate.d\` in the target environment just as `activate.bat` would do with `.bat` scripts.
+For fine control of activation of an individual environment, `activate.ps1` will execute both `.ps1` and `.bat` scripts in `etc\conda\activate.d\` in the target environment just as `activate.bat` would do with `.bat` scripts.
 Similarly, `deactivate.ps1` exetutes sctipts in `etc\conda\deactivate.d\`
 
 For more help:
@@ -43,4 +43,5 @@ PS C:> help activate.ps1
 ## Credits
 
 * Original Conda batch files.
+* <https://github.com/Wintellect/WintellectPowerShell> A modified PS 2.0 compatible `Invoke-CmdScript` is used to maintain .bat backwards compatibility
 * <https://github.com/Liquidmantis/PSCondaEnvs> (for older Anaconda versions, no support for multiple envs locations)
