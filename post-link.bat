@@ -1,3 +1,4 @@
+@echo off
 copy NUL %PREFIX%\.messages.txt
 
 powershell -Command "Get-ExecutionPolicy"  > tmp_stdout.txt
