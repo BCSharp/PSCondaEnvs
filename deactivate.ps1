@@ -46,10 +46,7 @@ Write-Verbose "Deactivating environment ""$Env:CONDA_DEFAULT_ENV""..."
 
 $deactivate_d = "${Env:CONDA_PREFIX}/etc/conda/deactivate.d"
 if (Test-Path $deactivate_d) {
-    Write-Verbose "Running .ps1 deactivate scripts in '$deactivate_d'..."
-    Push-Location $deactivate_d
-    Get-ChildItem -Filter *.ps1 | Select-Object -ExpandProperty FullName | Invoke-Expression
-    
+    Push-Location $deactivate_d    
     # If in Windows, we allow backwards compatibility to run .bat files.  This relies upon 
     # the Invoke-CmdScript by John Robbins.  The version provided maintains PS 2.0 compatibility
     if (-not ($IsOSX -or $IsLinux)) {
@@ -72,6 +69,9 @@ if (Test-Path $deactivate_d) {
             }
         }
     }
+    Write-Verbose "Running .ps1 deactivate scripts in '$deactivate_d'..."
+    Get-ChildItem -Filter *.ps1 | Select-Object -ExpandProperty FullName | Invoke-Expression
+
     Pop-Location
 }
 

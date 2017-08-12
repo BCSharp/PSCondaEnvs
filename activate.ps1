@@ -128,10 +128,7 @@ function global:prompt
 # Run any activate scripts
 $activate_d = "${Env:CONDA_PREFIX}/etc/conda/activate.d"
 if (Test-Path $activate_d) {
-    Write-Verbose "Running .ps1 activate scripts in '$activate_d'..."
     Push-Location $activate_d
-    Get-ChildItem -Filter *.ps1 | Select-Object -ExpandProperty FullName | Invoke-Expression
-
     # If in Windows, we allow backwards compatibility to run .bat files.  This relies upon 
     # the Invoke-CmdScript by John Robbins.  The version provided maintains PS 2.0 compatibility
     if (-not ($IsOSX -or $IsLinux)) {
@@ -154,6 +151,9 @@ if (Test-Path $activate_d) {
             }
         }
     }
+    Write-Verbose "Running .ps1 activate scripts in '$activate_d'..."
+    Get-ChildItem -Filter *.ps1 | Select-Object -ExpandProperty FullName | Invoke-Expression
+
     Pop-Location
 }
 
