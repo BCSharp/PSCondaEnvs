@@ -47,9 +47,6 @@ Any previously active Conda environment will be deactivated.
 #>
 
 Param(
-    [Parameter(
-        HelpMessage="Name of a virtual enviroment created by conda"
-    )]
     [string] $Name = "root"
 )
 

@@ -1,7 +1,7 @@
 # PSCondaEnvs
 
 Implementation of Conda's activate/deactivate functions in PowerShell.
-Works with Anaconda 4.3 and newer (possibly older too).
+Works with Anaconda 4.1 and newer.
 Works on Windows, macOS, Linux.
 Works with PowerShell 2.0 and up.
 
