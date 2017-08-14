@@ -18,7 +18,7 @@ activate.ps1
 https://github.com/BCSharp/PSCondaEnvs
 
 .EXAMPLE
-(TestEnv) PS C:> deactivate.ps1
+(TestEnv) PS C:> deactivate
 PS C:>
 
 This command deactivates the active Conda environment named "TestEnv".
@@ -29,6 +29,11 @@ Param(
     [Parameter()]
     [Switch] $Hold
 )
+
+# fix for pre-PS3
+if (-not $PSScriptRoot) { 
+    $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent 
+}
 
 
 if (-not (Test-Path Env:CONDA_DEFAULT_ENV))
@@ -41,26 +46,53 @@ Write-Verbose "Deactivating environment ""$Env:CONDA_DEFAULT_ENV""..."
 
 $deactivate_d = "${Env:CONDA_PREFIX}/etc/conda/deactivate.d"
 if (Test-Path $deactivate_d) {
-    Write-Verbose "Running deactivate scripts in '$deactivate_d'..."
-    Push-Location $deactivate_d
-    Get-ChildItem -Filter *.ps1 | Select-Object -ExpandProperty FullName  | Invoke-Expression
+    Push-Location $deactivate_d    
+    # If in Windows, we allow backwards compatibility to run .bat files.  This relies upon 
+    # the Invoke-CmdScript by John Robbins.  The version provided maintains PS 2.0 compatibility
+    if (-not ($IsOSX -or $IsLinux)) {
+        $loadBatFiles = $FALSE
+        # If WintellectPowerShell module installed use that
+        $CmdScriptPath = Join-Path -Path $PSScriptRoot -ChildPath "invoke_cmdscript.ps1"
+        if (Get-Command Invoke-CmdScript -CommandType Function -errorAction SilentlyContinue ) {
+            $loadBatFiles = $TRUE
+        } elseif ([System.IO.File]::Exists("$CmdScriptPath")) {
+            . $CmdScriptPath
+            $loadBatFiles = $TRUE
+        } else {
+            Write-Verbose "Invoke-CmdScript function not available! .bat files won't run"
+        }
+        if ($loadBatFiles) {
+            Write-Verbose "Running .bat deactivate scripts in '$deactivate_d'..."
+            $bats = Get-ChildItem -Filter *.bat | Select-Object -ExpandProperty FullName
+            foreach ($bat in $bats) {
+                Invoke-CmdScript $bat
+            }
+        }
+    }
+    Write-Verbose "Running .ps1 deactivate scripts in '$deactivate_d'..."
+    Get-ChildItem -Filter *.ps1 | Select-Object -ExpandProperty FullName | Invoke-Expression
+
     Pop-Location
 }
 
 # This removes the previous Env from the path and restores the original path
 $pathSep = [System.IO.Path]::PathSeparator
 if ($CondaEnvPaths) {
-    $pathArray = $Env:PATH -split $pathSep
+    [System.Collections.ArrayList]$pathArray = $Env:PATH -split $pathSep
     if ($Hold) {
         Write-Verbose "Setting CONDA_PATH_PLACEHOLDER where current environment paths are..."
-        $position = @($pathArray).IndexOf($CondaEnvPaths[0])
+        $position = $pathArray.IndexOf($CondaEnvPaths[0])
         if ($position -ge 0) {
             $pathArray[$position] = 'CONDA_PATH_PLACEHOLDER'
         }
     }
 
     Write-Verbose 'Removing environment search paths from $PATH...'
-    $Env:PATH = ($pathArray | Where-Object {$_ -notin $CondaEnvPaths}) -join $pathSep
+    # Remove the first occurance of each of the env paths
+    foreach ($element in $CondaEnvPaths) {
+	    $pathArray.Remove($element)
+    }
+    $Env:PATH = $pathArray -join $pathSep
     Write-Verbose 'Restored $PATH is:'
     Write-Verbose ('-' * 20)
     $Env:PATH -split $pathSep | Write-Verbose

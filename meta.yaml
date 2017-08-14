@@ -1,0 +1,19 @@
+package:
+  name: pscondaenvs
+  version: "1.2.0"
+
+build:
+  number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
+
+requirements:
+  run:
+    - conda >=4.1
+
+source:
+  path: ./
+
+about:
+  home: https://github.com/BCSharp/PSCondaEnvs
+  license: MIT
+  license_file: LICENSE
+  summary: Quickly and easily add `activate` and `deactivate` support to your Powershell console.  Just do `conda install -n root -c pscondaenvs pscondaenvs`.
