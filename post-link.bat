@@ -1,8 +1,7 @@
 @echo off
 copy NUL %PREFIX%\.messages.txt
 
-powershell -Command "Get-ExecutionPolicy"  > tmp_stdout.txt
-set /p VAR=<tmp_stdout.txt
+FOR /F "delims=" %%i IN ('CALL powershell.exe -Command Get-ExecutionPolicy') DO SET var=%%i
 IF NOT "%var%"=="RemoteSigned" (
     IF NOT "%var%"=="Unrestricted" (
         echo WARNING: Your ExecutionPolicy is not configured for 'activate' and 'deactivate' under Powershell. >> %PREFIX%\.messages.txt
@@ -13,7 +12,5 @@ IF NOT "%var%"=="RemoteSigned" (
         echo. >> %PREFIX%\.messages.txt
     )
 )
-
-DEL tmp_stdout.txt
 
 echo Use 'activate ^<envname^>' or 'deactivate ^<envname^>' in Powershell to manage the current environment. >> %PREFIX%\.messages.txt
