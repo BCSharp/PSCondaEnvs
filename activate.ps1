@@ -19,7 +19,7 @@ Name of a virtual enviroment created by conda.  Not specifying this will activat
 environment.
 
 .NOTES
-Tested with Anaconda 4.3.8
+Tested with Anaconda 4.3.8, 4.4.11
 
 Modifies the search PATH variable.
 
@@ -55,14 +55,24 @@ if (-not $PSScriptRoot) {
     $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent 
 }
 
+# Locate the deactivate.ps1 script
+$deactivateScript = Join-Path -Path $PSScriptRoot -ChildPath deactivate.ps1
 
-Write-Verbose "Ensure that path or name passed is valid before deactivating anything"
+Write-Verbose "Locate conda executable"
 if ($IsOSX -or $IsLinux) {
+    $condaCmd = 'conda'
     $shellType = 'bash'
 } else {
+    $condaCmd = 'conda.exe'
     $shellType = 'cmd.exe'
 }
-conda '..checkenv' $shellType $Name
+if (Test-Path $PSScriptRoot/$condaCmd) {
+	$condaCmd = Join-Path -Path $PSScriptRoot -ChildPath $condaCmd
+	Write-Verbose $condaCmd
+}
+
+Write-Verbose "Ensure that path or name passed is valid before deactivating anything"
+& $condaCmd '..checkenv' $shellType $Name
 if (-not $?) {
     Write-Host "Environment not changed." -ForegroundColor Red
     exit 
@@ -71,11 +81,11 @@ if (-not $?) {
 # Deactivate a previous activation if it is live
 if (Test-Path Env:CONDA_DEFAULT_ENV) {
     Write-Verbose "Deactivate current environment ""$Env:CONDA_DEFAULT_ENV""..."
-    deactivate.ps1 -Hold
+    & $deactivateScript -Hold
 }
 
 Write-Verbose "Activating environment ""$Name""..."
-$newPath = (conda '..activate' $shellType $Name)
+$newPath = (& $condaCmd '..activate' $shellType $Name)
 if (-not $?)
 {
     Write-Host 'Environment not activated.' -ForegroundColor Red
@@ -156,10 +166,10 @@ if (Test-Path $activate_d) {
 
 # Because Conda won't propogate activate.ps1 or deactivate.ps1 throughout all environments automatically,
 # we add an alias to override any .bat or .sh files that might try to be executed instead.
-if(!(Get-Alias -name activate*)) {
-    New-Alias activate activate.ps1 -Scope Global
+if(!(Get-Alias -Name activate*)) {
+    New-Alias -Name activate -Value $MyInvocation.MyCommand.Path -Scope Global
 }
     
-if(!(Get-Alias -name deactivate*)) {
-    New-Alias deactivate deactivate.ps1 -Scope Global
+if(!(Get-Alias -Name deactivate*)) {
+    New-Alias -Name deactivate -Value $deactivateScript -Scope Global
 }
