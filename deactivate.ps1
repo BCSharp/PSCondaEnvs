@@ -83,7 +83,7 @@ if ($CondaEnvPaths) {
         Write-Verbose "Setting CONDA_PATH_PLACEHOLDER where current environment paths are..."
         $position = $pathArray.IndexOf($CondaEnvPaths[0])
         if ($position -ge 0) {
-            $pathArray[$position] = 'CONDA_PATH_PLACEHOLDER'
+            $pathArray.Insert($position, 'CONDA_PATH_PLACEHOLDER')
         }
     }
 
