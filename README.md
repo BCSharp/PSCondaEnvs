@@ -39,7 +39,7 @@ PS C:> help activate.ps1
 * `Activate.ps1` uses internal conda commands `..checkenv` and `..activate` (just as `activate.bat` does). Things may stop working when conda changes the semantics of those commands. Also, older versions of conda (probably) do not support those commands.
 * The names of the scripts do not follow established PowerShell naming convention. Probably more appriopriate names for the sctipts would be `Enable-CondaEnv`/`Disable-CondaEnv`, or, even better: `Enter-CondaEnvironment`/`Exit-CondaEnvironment` (the verbs enable/disable are meant for lifecycle management). Long, but then again: New-Alias is your friend.
 * `activate` and `deactivate` Powershell Aliases are automatically added when you first activate your environment.  This is to override any activate/deactivate.bat or .activate/deactivate.sh files that appear in your individual environment's binary path, that would normally execute instead.
-* You might no be allowed to execute the scripts due to your systems execution policies. A simple, though dangerous, way to circumvent this is to allow the execution of all remoty signed scripts, by running the following command from an Admin-Powershell: `set-executionpolicy remotesigned`. You may need to restart any open Powershell sessions for the change to take effect.
+* You might no be allowed to execute the PowerShell scripts due to your systems execution policies. A simple, though dangerous, way to circumvent this is to allow the execution of all remoty signed scripts, by running the following command from an Admin-Powershell: `set-executionpolicy remotesigned`. You may need to restart any open Powershell sessions for the change to take effect.
 
 ## Credits
 
