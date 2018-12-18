@@ -41,6 +41,24 @@ PS C:> help activate.ps1
 * `activate` and `deactivate` Powershell Aliases are automatically added when you first activate your environment.  This is to override any activate/deactivate.bat or .activate/deactivate.sh files that appear in your individual environment's binary path, that would normally execute instead.
 * You might not be allowed to execute the PowerShell scripts due to your systems execution policies. The default execution policy on Windows is 'Restricted', which does not allow execution of any scripts. The default execution policy on Linux and macOS is 'Unrestricted', which allows execution of any script. A simple, though reducing system security, way to enable execution of `activate.ps1`/`deactivate.ps1` on Windows is to allow the execution of all local scripts unconditionally and all signed scripts that originate from remote locations. This can be done by running the following command from an Admin-Powershell: `Set-ExecutionPolicy RemoteSigned`. An alternative and more secure option is to use `Set-ExecutionPolicy AllSigned`, in which case both local and remote scripts have to be signed to be executable, however in this case, since all scripts from *PSCondaEnvs* are unsigned, you will have to sign them yourself with a valid cetificate. You may need to restart any open Powershell sessions for the change to take effect. Verify the changes by running `Get-ExecutionPolicy`.
 
+### If you use ConEmu or Cmder as a terminal emulator
+
+The ConEmu and Cmder terminal emulators does not allow the prompt layout to change by default, and since the activate-scripts changes the promt, activating from either of those terinal emulators will fail with the default settings. Cmder is based on ConEmu, so the following should work for both terminal emulators.
+The settings can be changed by modifying the `profile.ps1`, which contains your users settings -- the file might not exist until you edit some of the terminal emulators preferences, or you create it yourself.
+For Cmder, navigate to the program folder, and open the file `vendor\profile.ps1`, and change the line `Set-Item -Path function:\prompt  -Value $Prompt -Options ReadOnly` to `Set-Item -Path function:\prompt  -Value $Prompt  # -Options ReadOnly` to enable scripts to modify the prompt.
+Once done, you can activate your Conda-environment from Cmder or ConEmu:
+```
+D:\portable\cmder
+λ
+
+D:\portable\cmder
+λ  activate py37
+
+D:\portable\cmder
+λ (py37)
+```
+
+
 ## Credits
 
 * Original Conda batch files.
