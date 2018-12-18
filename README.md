@@ -44,6 +44,7 @@ PS C:> help activate.ps1
 ### If you use ConEmu or Cmder as a terminal emulator
 
 The ConEmu and Cmder terminal emulators does not allow the prompt layout to change by default, and since the activate-scripts changes the promt, activating from either of those terinal emulators will fail with the default settings. Cmder is based on ConEmu, so the following should work for both terminal emulators.
+
 The settings can be changed by modifying the `profile.ps1`, which contains your users settings -- the file might not exist until you edit some of the terminal emulators preferences, or you create it yourself.
 For Cmder, navigate to the program folder, and open the file `vendor\profile.ps1`, and change the line `Set-Item -Path function:\prompt  -Value $Prompt -Options ReadOnly` to `Set-Item -Path function:\prompt  -Value $Prompt  # -Options ReadOnly` to enable scripts to modify the prompt.
 Once done, you can activate your Conda-environment from Cmder or ConEmu:
