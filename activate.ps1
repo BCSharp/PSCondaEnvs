@@ -9,7 +9,7 @@ During activation, PS1 scripts in etc/conda/activate.d will be run as well.
 Note that there may be several directories in which envs are stored.
 When Anaconda is installed by the Visual Studio Installer,
 one location is in the Anaconda installation dir/envs (may be read-only for the current user), 
-another one in $HOME/.conda/envs.
+another one in $HOME/.conda/envs. Run 'conda info' for the location of envs directories.
 
 The command does not produce any output on success.
 Use parameter -Verbose to trace the execution.
@@ -19,7 +19,7 @@ Name of a virtual enviroment created by conda.  Not specifying this will activat
 environment.
 
 .NOTES
-Tested with Anaconda 4.3.8, 4.4.11
+Tested with Anaconda 4.3.8, 4.4.11, 4.5.12
 
 Modifies the search PATH variable.
 
@@ -47,6 +47,7 @@ Any previously active Conda environment will be deactivated.
 #>
 
 Param(
+    [Parameter()]
     [string] $Name = "root"
 )
 

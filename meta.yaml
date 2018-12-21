@@ -1,6 +1,6 @@
 package:
   name: pscondaenvs
-  version: "1.2.4"
+  version: "1.2.5"
 
 build:
   number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
