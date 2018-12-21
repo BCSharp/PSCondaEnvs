@@ -59,7 +59,7 @@ if (-not $PSScriptRoot) {
 $deactivateScript = Join-Path -Path $PSScriptRoot -ChildPath deactivate.ps1
 
 Write-Verbose "Locate conda executable"
-if ($IsOSX -or $IsLinux) {
+if ($IsLinux -or $IsMacOS -or $IsOSX) {
     $condaCmd = 'conda'
     $shellType = 'bash'
 } else {

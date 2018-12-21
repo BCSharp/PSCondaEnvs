@@ -49,7 +49,7 @@ if (Test-Path $deactivate_d) {
     Push-Location $deactivate_d    
     # If in Windows, we allow backwards compatibility to run .bat files.  This relies upon 
     # the Invoke-CmdScript by John Robbins.  The version provided maintains PS 2.0 compatibility
-    if (-not ($IsOSX -or $IsLinux)) {
+    if (-not ($IsLinux -or $IsMacOS -or $IsOSX)) {
         $loadBatFiles = $FALSE
         # If WintellectPowerShell module installed use that
         $CmdScriptPath = Join-Path -Path $PSScriptRoot -ChildPath "invoke_cmdscript.ps1"
