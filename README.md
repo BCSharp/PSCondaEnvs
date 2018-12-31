@@ -14,6 +14,13 @@ conda install -n root -c pscondaenvs pscondaenvs
 
 Done! Note, you may need to change the Powershell `Execution-Policy` to `RemoteSigned` in order for this package to work (see caveats below for more details).
 
+In case of any issues, first update to the latest version:
+```
+conda update -n root -c pscondaenvs pscondaenvs
+```
+
+If the problem persists, file an issue report on GitHub.
+
 ## Manual Install
 
 If you want to install manually for some reason, copy `activate.ps1`, `deactivate.ps1` and `invoke_cmdscript.ps1` into your Anaconda\Scripts directory (Windows) or `activate.ps1` and `deactivate.ps1` to anaconda/bin directory (macOS, Linux).
