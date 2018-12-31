@@ -131,11 +131,21 @@ if ((Get-Item Function:prompt).Options -contains [System.Management.Automation.S
     function global:CondaUserPrompt {''}
     $Function:CondaUserPrompt = $Function:prompt
 
-    Write-Verbose 'Set up environment-specific prompt...'
-    function global:prompt
-    {
-        # Add the env name to the current user prompt.
-        "($Env:CONDA_DEFAULT_ENV) " + (CondaUserPrompt)
+    if ($PSEdition -eq "Core") {
+        Write-Verbose 'Set up environment-specific prompt for Powershell Core Edition...'
+        function global:prompt
+        {
+            # Add the env name to the current user prompt.
+            "($Env:CONDA_DEFAULT_ENV) " + (CondaUserPrompt)
+        }
+    } else {
+        Write-Verbose 'Set up environment-specific prompt for Powershell Desktop Edition...'
+        function global:prompt
+        {
+            # Print the env name before the current user prompt.
+            Write-Host "($Env:CONDA_DEFAULT_ENV) " -NoNewline
+            CondaUserPrompt
+        }
     }
 }
 
