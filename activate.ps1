@@ -122,15 +122,21 @@ Write-Verbose ('-' * 20)
 # always store the full path to the environment, since location of CONDA_DEFAULT_ENV varies
 $Env:CONDA_PREFIX = $CondaEnvPaths[0]
 
-Write-Verbose 'Capture existing user prompt...'
-function global:CondaUserPrompt {''}
-$Function:CondaUserPrompt = $Function:prompt
 
-Write-Verbose 'Set up environment-specific prompt...'
-function global:prompt
-{
-    # Add the env name to the current user prompt.
-    "($Env:CONDA_DEFAULT_ENV) " + (CondaUserPrompt)
+if ((Get-Item Function:prompt).Options -contains [System.Management.Automation.ScopedItemOptions]::Readonly) {
+    Write-Verbose 'Prompt function is read-only hence not changing it.'
+    Write-Host "Conda environment ""$Name"" activated."
+} else {
+    Write-Verbose 'Capture existing user prompt...'
+    function global:CondaUserPrompt {''}
+    $Function:CondaUserPrompt = $Function:prompt
+
+    Write-Verbose 'Set up environment-specific prompt...'
+    function global:prompt
+    {
+        # Add the env name to the current user prompt.
+        "($Env:CONDA_DEFAULT_ENV) " + (CondaUserPrompt)
+    }
 }
 
 # Run any activate scripts

@@ -104,11 +104,16 @@ if ($CondaEnvPaths) {
 if (Test-Path Function:CondaUserPrompt) {
     Write-Verbose 'Restoring original user prompt...'
     $Function:prompt = $Function:CondaUserPrompt
+    Remove-Item Function:condaUserPrompt
+} else {
+    # No prompt change so just report in a single line
+    if (-not $Hold) {
+        Write-Host "Conda environment ""$Env:CONDA_DEFAULT_ENV"" deactivated."
+    }
 }
 
 # Clean up 
 Write-Verbose 'Deleting environment-specific variables and functions...'
 Remove-Item Env:CONDA_DEFAULT_ENV
 Remove-Item Env:CONDA_PREFIX
-Remove-Item Function:condaUserPrompt
 Remove-Variable CondaEnvPaths -Scope Global

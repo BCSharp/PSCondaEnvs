@@ -47,6 +47,14 @@ PS C:> help activate.ps1
 * The names of the scripts do not follow established PowerShell naming convention. Probably more appriopriate names for the sctipts would be `Enable-CondaEnv`/`Disable-CondaEnv`, or, even better: `Enter-CondaEnvironment`/`Exit-CondaEnvironment` (the verbs enable/disable are meant for lifecycle management). Long, but then again: New-Alias is your friend.
 * `activate` and `deactivate` Powershell Aliases are automatically added when you first activate your environment.  This is to override any activate/deactivate.bat or .activate/deactivate.sh files that appear in your individual environment's binary path, that would normally execute instead.
 * You might not be allowed to execute the PowerShell scripts due to your systems execution policies. The default execution policy on Windows is 'Restricted', which does not allow execution of any scripts. The default execution policy on Linux and macOS is 'Unrestricted', which allows execution of any script. A simple, though reducing system security, way to enable execution of `activate.ps1`/`deactivate.ps1` on Windows is to allow the execution of all local scripts unconditionally and all signed scripts that originate from remote locations. This can be done by running the following command from an Admin-Powershell: `Set-ExecutionPolicy RemoteSigned`. An alternative and more secure option is to use `Set-ExecutionPolicy AllSigned`, in which case both local and remote scripts have to be signed to be executable, however in this case, since all scripts from *PSCondaEnvs* are unsigned, you will have to sign them yourself with a valid cetificate. You may need to restart any open Powershell sessions for the change to take effect. Verify the changes by running `Get-ExecutionPolicy`.
+* Some execution environments (e.g. [Cmder](http://cmder.net/)) make the Powershell prompt function read-only. PSCondaEnvs normally modifies the prompt function to display the name of the currently active Conda environment, but if the prompt function is set to read-only, PSCondaEnvs will leave it unmodified. In such case, to show the name of the active environment, the prompt function has to be adapted by the user. For instance, if using Cmder, edit the file `$Env:CMDER_ROOT\config\user_profile.ps1` and change the definition of `$PrePrompt` to something like:
+```Powershell
+[ScriptBlock]$PrePrompt = {
+    if ($Env:CONDA_DEFAULT_ENV) {
+        return "($Env:CONDA_DEFAULT_ENV) "
+    }
+}
+```
 
 ## Credits
 
