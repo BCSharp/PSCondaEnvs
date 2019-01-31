@@ -72,6 +72,16 @@ if (Test-Path $PSScriptRoot/$condaCmd) {
 	Write-Verbose $condaCmd
 }
 
+Write-Verbose "Determine conda version"
+$conda_version_string = (& $condaCmd --version)
+[int[]]$conda_version = $conda_version_string.Split(' ')[1].Split('.')
+
+if ($conda_version[0] -gt 4 -or ($conda_version[0] -eq 4 -and $conda_version[1] -ge 6)) {
+    Write-Warning "You are using $conda_version_string, which has built-in support for PowerShell."
+    Write-Warning "This script may stop working with conda versions newer than 4.6"
+    Write-Warning "For more info on how to set up PowerShell for conda, run 'conda init --help'"
+}
+
 Write-Verbose "Ensure that path or name passed is valid before deactivating anything"
 & $condaCmd '..checkenv' $shellType $Name
 if (-not $?) {
