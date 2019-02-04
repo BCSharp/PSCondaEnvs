@@ -3,7 +3,7 @@
 Implementation of Conda's activate/deactivate functions in PowerShell.
 Works on Windows, macOS, Linux.
 Works with PowerShell 2.0 and up.
-Works with Conda from 4.1 up to 4.5. [Conda 4.6 introduced native support for PowerShell](https://www.anaconda.com/blog/developer-blog/conda-4-6-release/). If you have Conda 4.6.0 or higher, run `conda init --help` for more info.
+Works with Conda from 4.1 up to 4.5. [Conda 4.6 introduced native support for PowerShell](https://www.anaconda.com/conda-4-6-release/). If you have Conda 4.6.0 or higher, run `conda init --help` for more info.
 
 ## Quick Install
 
